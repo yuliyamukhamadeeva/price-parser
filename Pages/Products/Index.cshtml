@@ -1,0 +1,64 @@
+
+@page
+@model PriceParser.Web.Pages.Products.IndexModel
+@{
+    ViewData["Title"] = "Товары";
+}
+
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <div>
+        <h1 class="h3 mb-1">Товары</h1>
+        <div class="text-secondary">Добавляй товары и ссылки на них в магазинах</div>
+    </div>
+    <a class="btn btn-primary" asp-page="Create">Добавить товар</a>
+</div>
+
+<div class="card shadow-soft">
+    <div class="card-body">
+        <form method="get" class="row g-2 mb-3">
+            <div class="col-12 col-md-6">
+                <input class="form-control" name="q" value="@Model.Query" placeholder="Поиск по названию" />
+            </div>
+            <div class="col-12 col-md-auto">
+                <button class="btn btn-outline-secondary w-100" type="submit">Найти</button>
+            </div>
+            <div class="col-12 col-md-auto">
+                <a class="btn btn-outline-secondary w-100" asp-page="Index">Сброс</a>
+            </div>
+        </form>
+
+        @if (!Model.Items.Any())
+        {
+            <div class="text-secondary">Пока нет товаров</div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                    <thead>
+                        <tr class="text-secondary">
+                            <th>Название</th>
+                            <th class="text-nowrap">SKU</th>
+                            <th class="text-nowrap">Ссылок</th>
+                            <th class="text-end"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var p in Model.Items)
+                    {
+                        <tr>
+                            <td class="fw-semibold">@p.Name</td>
+                            <td class="text-secondary">@p.Sku</td>
+                            <td><span class="badge text-bg-light border">@p.LinksCount</span></td>
+                            <td class="text-end">
+                                <a class="btn btn-sm btn-outline-primary" asp-page="Details" asp-route-id="@p.Id">Открыть</a>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>
+
