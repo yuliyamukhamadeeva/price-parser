@@ -1,0 +1,38 @@
+@page
+@model PriceParser.Web.Pages.Products.CreateModel
+@{
+    ViewData["Title"] = "Добавить товар";
+}
+
+<div class="mb-3">
+    <a class="text-decoration-none" asp-page="Index">← Назад к товарам</a>
+</div>
+
+<div class="card shadow-soft">
+    <div class="card-body">
+        <h1 class="h4 mb-3">Добавить товар</h1>
+
+        <form method="post" class="row g-3">
+            <div class="col-12">
+                <label class="form-label">Название</label>
+                <input class="form-control" asp-for="Input.Name" />
+                <span class="text-danger" asp-validation-for="Input.Name"></span>
+            </div>
+
+            <div class="col-12 col-md-6">
+                <label class="form-label">SKU</label>
+                <input class="form-control" asp-for="Input.Sku" />
+                <span class="text-danger" asp-validation-for="Input.Sku"></span>
+            </div>
+
+            <div class="col-12 d-flex gap-2">
+                <button class="btn btn-primary" type="submit">Сохранить</button>
+                <a class="btn btn-outline-secondary" asp-page="Index">Отмена</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
