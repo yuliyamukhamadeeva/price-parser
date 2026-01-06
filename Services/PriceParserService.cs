@@ -39,12 +39,15 @@ public class PriceParserService
         foreach (var link in links)
         {
             if (string.IsNullOrWhiteSpace(link.Url)) continue;
+            
 
             decimal? price = null;
+            
 
             try
             {
                 price = await _extractor.TryExtractAsync(link.Url, http, ct);
+                
             }
             catch (Exception ex)
             {
@@ -61,12 +64,15 @@ public class PriceParserService
             {
                 ProductId = link.ProductId,
                 ShopId = link.ShopId,
-                PriceKopeks = ToMinorUnits(price.Value),
+                PriceKopeks = ToKopeks(price.Value),
                 ParsedAt = DateTime.UtcNow
             };
 
+_logger.LogInformation("Цена {Price} коп. | {Shop} | {Url} | {Time}",
+    log.PriceKopeks, link.Shop.Name, link.Url, log.ParsedAt);
             _db.PriceLogs.Add(log);
             saved++;
+            
         }
 
         if (saved > 0)
@@ -74,7 +80,7 @@ public class PriceParserService
 
         return saved;
     }
-    private static long ToMinorUnits(decimal rub)
+    private static long ToKopeks(decimal rub)
 {
     return (long)Math.Round(rub * 100m, 0, MidpointRounding.AwayFromZero);
 }
