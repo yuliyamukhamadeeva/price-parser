@@ -1,4 +1,3 @@
-
 @page
 @model PriceParser.Web.Pages.Products.IndexModel
 @{
@@ -40,6 +39,8 @@
                             <th>Название</th>
                             <th class="text-nowrap">SKU</th>
                             <th class="text-nowrap">Ссылок</th>
+                            <th class="text-nowrap">Мин. цена</th>
+                            <th class="text-nowrap">Магазин</th>
                             <th class="text-end"></th>
                         </tr>
                     </thead>
@@ -50,6 +51,29 @@
                             <td class="fw-semibold">@p.Name</td>
                             <td class="text-secondary">@p.Sku</td>
                             <td><span class="badge text-bg-light border">@p.LinksCount</span></td>
+
+                            <td class="text-nowrap">
+                                @if (p.MinPriceKopeks.HasValue)
+                                {
+                                    <span class="fw-semibold">@((p.MinPriceKopeks.Value / 100m).ToString("0.00"))</span>
+                                }
+                                else
+                                {
+                                    <span class="text-secondary">—</span>
+                                }
+                            </td>
+
+                            <td class="text-nowrap text-secondary">
+                                @if (!string.IsNullOrWhiteSpace(p.MinShopName))
+                                {
+                                    @p.MinShopName
+                                }
+                                else
+                                {
+                                    <span class="text-secondary">—</span>
+                                }
+                            </td>
+
                             <td class="text-end">
                                 <a class="btn btn-sm btn-outline-primary" asp-page="Details" asp-route-id="@p.Id">Открыть</a>
                             </td>
@@ -61,4 +85,3 @@
         }
     </div>
 </div>
-

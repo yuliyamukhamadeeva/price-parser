@@ -12,13 +12,13 @@ public class PriceLog
 
     public string Url { get; set; } = default!;
 
-    // Цена в копейках (чтобы не было проблем с decimal)
+
     public long? PriceKopeks { get; set; }
     public string Currency { get; set; } = "RUB";
 
     public DateTime ParsedAt { get; set; } = DateTime.UtcNow;
 
-    // OK / ERROR / NOT_FOUND
+
     public string Status { get; set; } = "OK";
     public string? ErrorMessage { get; set; }
     public string? RawPriceText { get; set; }
