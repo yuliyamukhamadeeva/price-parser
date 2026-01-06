@@ -5,6 +5,12 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
+builder.Services.AddHttpClient();
+builder.Services.Configure<PriceParser.Web.Services.ParsingOptions>(builder.Configuration.GetSection("Parsing"));
+builder.Services.AddSingleton<PriceParser.Web.Services.GenericPriceExtractor>();
+builder.Services.AddScoped<PriceParser.Web.Services.PriceParserService>();
+builder.Services.AddHostedService<PriceParser.Web.Services.ParsingHostedService>();
+
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
     options.UseSqlite(builder.Configuration.GetConnectionString("Default"));
