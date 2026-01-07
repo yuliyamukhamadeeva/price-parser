@@ -18,7 +18,7 @@ cd PriceParser.Web
 dotnet restore
 
 dotnet run
-После запуска откройте адрес из консоли (обычно http://localhost:5xxx).
+После запуска откройте адрес из консоли (http://localhost:5241).
 ## База данных (SQLite)
 Используется SQLite-файл app.db. Подключение задаётся в appsettings.json:
 "ConnectionStrings": {
