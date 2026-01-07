@@ -11,10 +11,10 @@ public class ParsingOptions
 public class ParsingHostedService : BackgroundService
 {
     private readonly IServiceScopeFactory _scopeFactory;
-    private readonly IOptions<ParsingOptions> _options;
+    private readonly IOptionsMonitor<ParsingOptions> _options;
     private readonly ILogger<ParsingHostedService> _logger;
 
-    public ParsingHostedService(IServiceScopeFactory scopeFactory, IOptions<ParsingOptions> options, ILogger<ParsingHostedService> logger)
+    public ParsingHostedService(IServiceScopeFactory scopeFactory, IOptionsMonitor<ParsingOptions> options, ILogger<ParsingHostedService> logger)
     {
         _scopeFactory = scopeFactory;
         _options = options;
@@ -23,15 +23,15 @@ public class ParsingHostedService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        if (!_options.Value.Enabled) return;
-
-        var minutes = Math.Max(1, _options.Value.IntervalMinutes);
-        using var timer = new PeriodicTimer(TimeSpan.FromMinutes(minutes));
-
         while (!stoppingToken.IsCancellationRequested)
         {
-            await RunOnce(stoppingToken);
-            await timer.WaitForNextTickAsync(stoppingToken);
+            var opt = _options.CurrentValue;
+            var minutes = Math.Max(1, opt.IntervalMinutes);
+
+            if (opt.Enabled)
+                await RunOnce(stoppingToken);
+
+            await Task.Delay(TimeSpan.FromMinutes(minutes), stoppingToken);
         }
     }
 
