@@ -24,49 +24,61 @@ public class PriceParserService
         _logger = logger;
     }
 
-    public async Task<int> RunAsync(CancellationToken ct)
+
+    public Task<int> RunAsync(CancellationToken ct)
+        => RunAsync(ct, null);
+
+
+    public Task<int> RunAsync(int productId, CancellationToken ct)
+        => RunAsync(ct, productId);
+
+   
+    private async Task<int> RunAsync(CancellationToken ct, int? onlyProductId)
     {
         var http = _httpFactory.CreateClient();
 
-        var links = await _db.ProductLinks
+        var q = _db.ProductLinks
             .AsNoTracking()
             .Where(x => x.IsActive)
             .Include(x => x.Product)
             .Include(x => x.Shop)
-            .ToListAsync(ct);
+            .AsQueryable();
+
+        if (onlyProductId.HasValue)
+            q = q.Where(x => x.ProductId == onlyProductId.Value);
+
+        var links = await q.ToListAsync(ct);
 
         var saved = 0;
 
         foreach (var link in links)
         {
-            if (string.IsNullOrWhiteSpace(link.Url)) continue;
+            if (string.IsNullOrWhiteSpace(link.Url))
+                continue;
 
             decimal? price = null;
 
             try
             {
+            
                 var selectors = Array.Empty<string>();
 
                 if (!string.IsNullOrWhiteSpace(link.Shop.PriceSelectors))
                 {
                     try
                     {
-                        selectors = JsonSerializer.Deserialize<string[]>(link.Shop.PriceSelectors)
-                                    ?? Array.Empty<string>();
+                        selectors = JsonSerializer.Deserialize<string[]>(link.Shop.PriceSelectors) ?? Array.Empty<string>();
                     }
                     catch { }
                 }
 
-                _logger.LogInformation("Селекторы: {Len} | {Shop} | {Url}",
-                    selectors.Length, link.Shop.Name, link.Url);
+                _logger.LogInformation("Селекторы: {Len} | {Shop} | {Url}", selectors.Length, link.Shop.Name, link.Url);
 
-                price = await _extractor.TryExtractBySelectorsAsync(
-                    link.Url,
-                    selectors.Length > 0 ? selectors : Array.Empty<string>(),
-                    http,
-                    ct);
+     
+                if (selectors.Length > 0)
+                    price = await _extractor.TryExtractBySelectorsAsync(link.Url, selectors, http, ct);
 
-    
+              
                 price ??= await _extractor.TryExtractAsync(link.Url, http, ct);
             }
             catch (Exception ex)
@@ -74,21 +86,20 @@ public class PriceParserService
                 _logger.LogWarning(ex, "Ошибка парсинга {Url}", link.Url);
             }
 
-            if (!price.HasValue)
+            if (!price.HasValue || price.Value <= 0)
             {
                 _logger.LogInformation("Цена не найдена: {Shop} {Url}", link.Shop.Name, link.Url);
                 continue;
             }
 
-           var log = new PriceLog
-{
-    ProductId = link.ProductId,
-    ShopId = link.ShopId,
-    Url = link.Url,              
-    PriceKopeks = ToKopeks(price.Value),
-    ParsedAt = DateTime.UtcNow
-};
-
+            var log = new PriceLog
+            {
+                ProductId = link.ProductId,
+                ShopId = link.ShopId,
+                Url = link.Url, 
+                PriceKopeks = ToKopeks(price.Value),
+                ParsedAt = DateTime.UtcNow
+            };
 
             _logger.LogInformation("Цена {Price} коп. | {Shop} | {Url} | {Time}",
                 log.PriceKopeks, link.Shop.Name, link.Url, log.ParsedAt);
