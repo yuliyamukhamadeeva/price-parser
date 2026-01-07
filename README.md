@@ -1,15 +1,15 @@
-Price Parser (вариант: один магазин — santehnika-online.ru)
-Что делает проект
+## Price Parser (вариант: один магазин — santehnika-online.ru)
+# Что делает проект
 Это веб-приложение на ASP.NET Core (Razor Pages), которое позволяет:
 •	добавлять товары (название и при желании SKU);
 •	добавлять к товару ссылку на страницу товара в магазине;
 •	парсить цену со страницы товара и сохранять результат в SQLite;
 •	показывать минимальную цену и последние логи парсинга в интерфейсе.
 В текущем варианте проекта используется один магазин: https://santehnika-online.ru.
-Требования
+# Требования
 •	.NET SDK (например, 8.0);
 •	доступ в интернет (для загрузки страниц и установки Playwright Chromium).
-Как запустить
+# Как запустить
 1.	Перейдите в папку проекта (где находится PriceParser.Web).
 2.	Восстановите зависимости.
 3.	Запустите приложение.
@@ -19,7 +19,7 @@ dotnet restore
 
 dotnet run
 После запуска откройте адрес из консоли (обычно http://localhost:5xxx).
-База данных (SQLite)
+# База данных (SQLite)
 Используется SQLite-файл app.db. Подключение задаётся в appsettings.json:
 "ConnectionStrings": {
   "Default": "Data Source=app.db"
@@ -29,7 +29,7 @@ dotnet run
 •	остановите приложение;
 •	удалите файл app.db в папке PriceParser.Web;
 •	запустите приложение снова (dotnet run).
-Установка Playwright Chromium
+# Установка Playwright Chromium
 Playwright используется для получения HTML через headless-браузер.
 Вариант 1: через Playwright CLI
 dotnet tool install --global Microsoft.Playwright.CLI
@@ -51,7 +51,7 @@ pwsh ./PriceParser.Web/bin/Debug/net8.0/playwright.ps1 install chromium
 •	Enabled: true — включает фоновый запуск парсера;
 •	IntervalMinutes — интервал запуска в минутах.
 Если Enabled: false, парсинг доступен только вручную из интерфейса.
-Как пользоваться UI
+# Как пользоваться UI
 4.	Откройте раздел «Товары».
 5.	Нажмите «Добавить товар» и создайте товар (название, при желании SKU).
 6.	Нажмите «Открыть» у нужного товара.
